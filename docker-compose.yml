@@ -11,6 +11,8 @@ services:
       - ./nginx/upstream:/etc/nginx/upstream        # upstream.conf 교체 대상
       - ./nginx/upstream_blue.conf:/etc/nginx/upstream_blue.conf
       - ./nginx/upstream_green.conf:/etc/nginx/upstream_green.conf
+    networks:
+      - app-network
     depends_on:
       - sw_team_7_spring_blue
       - sw_team_7_spring_green
