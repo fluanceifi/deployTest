@@ -2,14 +2,15 @@ version: '3.8'
 
 services:
   sw_team_7_nginx:
-    image: nginx:latest
+    image: nginx:alpine
     container_name: sw_team_7_nginx
     ports:
       - "8620:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    networks:
-      - app-network
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/upstream:/etc/nginx/upstream        # upstream.conf 교체 대상
+      - ./nginx/upstream_blue.conf:/etc/nginx/upstream_blue.conf
+      - ./nginx/upstream_green.conf:/etc/nginx/upstream_green.conf
     depends_on:
       - sw_team_7_spring_blue
       - sw_team_7_spring_green
