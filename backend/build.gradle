@@ -36,7 +36,7 @@ sonar {
 	properties {
 		property 'sonar.projectKey', 'sw_team_7'
 		property 'sonar.projectName', 'sw_team_7'
-		property 'sonar.host.url', 'http://sw_team_7_sonarqube:9000'
+		property 'sonar.host.url', 'http://172.20.0.3:9000'
 		property 'sonar.sources', 'src/main/java'
 	}
 }
