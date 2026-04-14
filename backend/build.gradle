@@ -32,7 +32,7 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
-sonarqube {
+sonar {
 	properties {
 		property 'sonar.projectKey', 'sw_team_7'
 		property 'sonar.projectName', 'sw_team_7'
