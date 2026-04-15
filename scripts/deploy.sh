@@ -69,7 +69,7 @@ chmod +x "$SCRIPT_DIR/switch.sh"
 # 6. nginx /health 최종 확인
 # ──────────────────────────────────────────
 sleep 1
-if curl -sf "http://${HOST_IP}:${NGINX_PORT}/actuator/health" > /dev/null 2>&1; then
+if curl -sf "http://${HOST_IP}:${NGINX_PORT}/health" > /dev/null 2>&1; then
     echo "배포 완료: nginx 정상 응답"
 else
     echo "nginx /health 응답 없음 → 확인 필요"
