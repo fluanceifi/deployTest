@@ -36,7 +36,7 @@ echo "검사: 문법 통과"
 if ! docker exec nginx nginx -s reload; then
   echo "reload: 실패 - 롤백"
   cp $BACKUP_CONF $UPSTREAM_CONF #복원
-  docker excec nginx nginx -s reload #원본 reload
+  docker exce nginx nginx -s reload #원본 reload
   exit 1
 fi
 
