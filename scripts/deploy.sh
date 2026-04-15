@@ -6,7 +6,7 @@ set -e
 # 경로 설정 (스크립트 위치 기준 절대경로)
 # ──────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"  # backend/
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 UPSTREAM_CONF="$PROJECT_ROOT/nginx/conf.d/upstream.conf"
 NGINX_PORT="8620"

@@ -2,9 +2,12 @@
 #!/bin/bash
 
 # 디렉토리 설정
-UPSTREAM_DIR="./nginx/upstream"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+UPSTREAM_DIR="$PROJECT_ROOT/nginx/conf.d"
 UPSTREAM_CONF="$UPSTREAM_DIR/upstream.conf"
-BACKUP_CONF="./nginx/upstream/upstream.conf.bak"  # 백업 파일
+BACKUP_CONF="$PROJECT_ROOT/nginx/conf.d/upstream.conf.bak"  # 백업 파일
 
 # 백업
 cp $UPSTREAM_CONF $BACKUP_CONF
@@ -15,10 +18,10 @@ CURRENT=$(grep -o 'spring-blue\|spring-green' $UPSTREAM_CONF)
 # 파일 전환 → 문법 검사 → reload
 
 if [ "$CURRENT" == "spring-blue" ]; then
-  cp ./nginx/upstream_green.conf $UPSTREAM_CONF
+  cp "$PROJECT_ROOT/nginx/upstream/upstream_green.conf" "$UPSTREAM_CONF"
   echo " 파일 전환: spring blue → spring-green"
 else
-  cp ./nginx/upstream_blue.conf $UPSTREAM_CONF
+  cp "$PROJECT_ROOT/nginx/upstream/upstream_blue.conf" "$UPSTREAM_CONF"
   echo "파일 전환: spring-green → spring-blue"
 fi
 
@@ -36,7 +39,7 @@ echo "검사: 문법 통과"
 if ! docker exec nginx nginx -s reload; then
   echo "reload: 실패 - 롤백"
   cp $BACKUP_CONF $UPSTREAM_CONF #복원
-  docker exce nginx nginx -s reload #원본 reload
+  docker exec nginx nginx -s reload #원본 reload
   exit 1
 fi
 
