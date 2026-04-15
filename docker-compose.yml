@@ -22,6 +22,8 @@ services:
     container_name: sw_team_7_spring_blue
     ports:
       - "8630:8080"
+    env_file:
+      - .env
     networks:
       - app-network
 
@@ -30,6 +32,8 @@ services:
     container_name: sw_team_7_spring_green
     ports:
       - "8640:8080"
+    env_file:
+      - .env
     networks:
       - app-network
 
