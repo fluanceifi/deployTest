@@ -7,10 +7,10 @@ services:
     ports:
       - "8620:80"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/upstream:/etc/nginx/upstream        # upstream.conf 교체 대상
-      - ./nginx/upstream_blue.conf:/etc/nginx/upstream_blue.conf
-      - ./nginx/upstream_green.conf:/etc/nginx/upstream_green.conf
+      - /home/sw_team_7/deployTest/nginx/conf.d:/etc/nginx/conf.d
+      - /home/sw_team_7/deployTest/nginx/upstream:/etc/nginx/upstream
+      - /home/sw_team_7/deployTest/nginx/upstream_blue.conf:/etc/nginx/upstream_blue.conf
+      - /home/sw_team_7/deployTest/nginx/upstream_green.conf:/etc/nginx/upstream_green.conf
     networks:
       - app-network
     depends_on:
