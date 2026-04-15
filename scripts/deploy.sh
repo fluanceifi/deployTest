@@ -61,7 +61,7 @@ echo "  헬스체크 통과"
 # 5. switch.sh 호출 (nginx upstream 교체 + reload)
 # ──────────────────────────────────────────
 echo "nginx 트래픽 전환..."
-chmod +x ."$SCRIPT_DIR/switch.sh"
+chmod +x "$SCRIPT_DIR/switch.sh"
 "$SCRIPT_DIR/switch.sh"
 
 # ──────────────────────────────────────────
