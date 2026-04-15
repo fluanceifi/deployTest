@@ -13,6 +13,7 @@ services:
     depends_on:
       - sw_team_7_spring_blue
       - sw_team_7_spring_green
+    command: /bin/sh -c "until getent hosts spring-green && getent hosts spring-blue; do echo 'DNS 대기 중...'; sleep 1; done && exec nginx -g 'daemon off;'"
 
   sw_team_7_spring_blue:
     image: sw_team_7_spring:latest
@@ -22,7 +23,9 @@ services:
     env_file:
       - .env
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - spring-blue
 
   sw_team_7_spring_green:
     image: sw_team_7_spring:latest
@@ -32,7 +35,9 @@ services:
     env_file:
       - .env
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - spring-green
 
 networks: # 네트워크
   app-network:
