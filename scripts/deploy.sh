@@ -2,7 +2,13 @@
 
 set -e
 
-UPSTREAM_CONF="./nginx/upstream/upstream.conf"
+# ──────────────────────────────────────────
+# 경로 설정 (스크립트 위치 기준 절대경로)
+# ──────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"  # backend/
+
+UPSTREAM_CONF="$PROJECT_ROOT/nginx/upstream/upstream.conf"
 NGINX_PORT="8620"
 MAX_RETRY=30
 
@@ -55,8 +61,8 @@ echo "  헬스체크 통과"
 # 5. switch.sh 호출 (nginx upstream 교체 + reload)
 # ──────────────────────────────────────────
 echo "nginx 트래픽 전환..."
-chmod +x ./scripts/switch.sh
-./scripts/switch.sh
+chmod +x ."$SCRIPT_DIR/switch.sh"
+"$SCRIPT_DIR/switch.sh"
 
 # ──────────────────────────────────────────
 # 6. nginx /health 최종 확인
