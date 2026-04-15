@@ -5,43 +5,49 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-UPSTREAM_DIR="$PROJECT_ROOT/nginx/conf.d"
-UPSTREAM_CONF="$UPSTREAM_DIR/upstream.conf"
-BACKUP_CONF="$PROJECT_ROOT/nginx/conf.d/upstream.conf.bak"  # 백업 파일
+NGINX_CONTAINER="sw_team_7_nginx"
+NGINX_CONF_PATH="/etc/nginx/conf.d/upstream.conf"
 
-# 백업
-cp $UPSTREAM_CONF $BACKUP_CONF
+# 현재 upstream 확인 (nginx 컨테이너 내부에서 직접 읽기)
+CURRENT=$(docker exec $NGINX_CONTAINER grep -o 'spring-blue\|spring-green' $NGINX_CONF_PATH)
 
-# 판별
-CURRENT=$(grep -o 'spring-blue\|spring-green' $UPSTREAM_CONF)
-
-# 파일 전환 → 문법 검사 → reload
-
+# 전환할 upstream 파일 결정
 if [ "$CURRENT" == "spring-blue" ]; then
-  cp "$PROJECT_ROOT/nginx/upstream/upstream_green.conf" "$UPSTREAM_CONF"
-  echo " 파일 전환: spring blue → spring-green"
+  NEW_CONF="$PROJECT_ROOT/nginx/upstream/upstream_green.conf"
+  echo "파일 전환: spring-blue → spring-green"
 else
-  cp "$PROJECT_ROOT/nginx/upstream/upstream_blue.conf" "$UPSTREAM_CONF"
+  NEW_CONF="$PROJECT_ROOT/nginx/upstream/upstream_blue.conf"
   echo "파일 전환: spring-green → spring-blue"
 fi
 
+# nginx 컨테이너에 직접 복사
+docker cp "$NEW_CONF" "$NGINX_CONTAINER:$NGINX_CONF_PATH"
 
 # 문법 검사
-if ! docker exec sw_team_7_nginx nginx -t; then
+if ! docker exec $NGINX_CONTAINER nginx -t; then
   echo "검사: nginx 문법 오류 - 롤백"
-  cp $BACKUP_CONF $UPSTREAM_CONF # 복원
+  docker exec $NGINX_CONTAINER sh -c "sed -i 's/spring-blue/ROLLBACK/g;s/spring-green/$CURRENT/g;s/ROLLBACK/spring-blue/g' $NGINX_CONF_PATH" 2>/dev/null || true
+  # 원본 파일 복원
+  if [ "$CURRENT" == "spring-blue" ]; then
+    docker cp "$PROJECT_ROOT/nginx/upstream/upstream_blue.conf" "$NGINX_CONTAINER:$NGINX_CONF_PATH"
+  else
+    docker cp "$PROJECT_ROOT/nginx/upstream/upstream_green.conf" "$NGINX_CONTAINER:$NGINX_CONF_PATH"
+  fi
   exit 1
 fi
 
 echo "검사: 문법 통과"
 
-#reload
-if ! docker exec sw_team_7_nginx nginx -s reload; then
+# reload
+if ! docker exec $NGINX_CONTAINER nginx -s reload; then
   echo "reload: 실패 - 롤백"
-  cp $BACKUP_CONF $UPSTREAM_CONF #복원
-  docker exec sw_team_7_nginx nginx -s reload #원본 reload
+  if [ "$CURRENT" == "spring-blue" ]; then
+    docker cp "$PROJECT_ROOT/nginx/upstream/upstream_blue.conf" "$NGINX_CONTAINER:$NGINX_CONF_PATH"
+  else
+    docker cp "$PROJECT_ROOT/nginx/upstream/upstream_green.conf" "$NGINX_CONTAINER:$NGINX_CONF_PATH"
+  fi
+  docker exec $NGINX_CONTAINER nginx -s reload
   exit 1
 fi
 
 echo "reload: 성공 - switch 완료"
-
