@@ -27,7 +27,7 @@ fi
 
 
 # 문법 검사
-if ! docker exec nginx nginx -t; then
+if ! docker exec sw_team_7_nginx nginx -t; then
   echo "검사: nginx 문법 오류 - 롤백"
   cp $BACKUP_CONF $UPSTREAM_CONF # 복원
   exit 1
@@ -36,10 +36,10 @@ fi
 echo "검사: 문법 통과"
 
 #reload
-if ! docker exec nginx nginx -s reload; then
+if ! docker exec sw_team_7_nginx nginx -s reload; then
   echo "reload: 실패 - 롤백"
   cp $BACKUP_CONF $UPSTREAM_CONF #복원
-  docker exec nginx nginx -s reload #원본 reload
+  docker exec sw_team_7_nginx nginx -s reload #원본 reload
   exit 1
 fi
 
