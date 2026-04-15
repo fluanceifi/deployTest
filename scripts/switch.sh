@@ -10,7 +10,7 @@ BACKUP_CONF="./nginx/upstream/upstream.conf.bak"  # 백업 파일
 cp $UPSTREAM_CONF $BACKUP_CONF
 
 # 판별
-CURRENT=$(grep | -o 'spring-blue\|spring-green' $UPSTREAM_CONF)
+CURRENT=$(grep -o 'spring-blue\|spring-green' $UPSTREAM_CONF)
 
 # 파일 전환 → 문법 검사 → reload
 
