@@ -37,6 +37,6 @@ services:
     networks:
       - app-network
 
-networks:
+networks: # 네트워크
   app-network:
     external: true
