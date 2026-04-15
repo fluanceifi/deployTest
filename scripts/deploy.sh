@@ -11,6 +11,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"  # backend/
 UPSTREAM_CONF="$PROJECT_ROOT/nginx/conf.d/upstream.conf"
 NGINX_PORT="8620"
 MAX_RETRY=30
+HOST_IP=$(ip route | awk 'NR==1 {print $3}')  # 게이트웨이 = 호스트 IP
 
 # ──────────────────────────────────────────
 # 1. upstream.conf 읽기 → Active / StandBy 판별
@@ -45,7 +46,7 @@ docker-compose up -d --no-deps --force-recreate "$STANDBY_SERVICE"
 # ──────────────────────────────────────────
 echo "StandBy 헬스체크 대기 중..."
 COUNT=0
-until curl -sf "http://localhost:${STANDBY_PORT}/actuator/health" > /dev/null 2>&1; do
+until curl -sf "http://${HOST_IP}:${STANDBY_PORT}/actuator/health" > /dev/null 2>&1; do
     COUNT=$((COUNT + 1))
     if [ "$COUNT" -ge "$MAX_RETRY" ]; then
         echo "헬스체크 실패: ${MAX_RETRY}초 안에 응답 없음 → 배포 중단"
@@ -68,7 +69,7 @@ chmod +x "$SCRIPT_DIR/switch.sh"
 # 6. nginx /health 최종 확인
 # ──────────────────────────────────────────
 sleep 1
-if curl -sf "http://localhost:${NGINX_PORT}/health" > /dev/null 2>&1; then
+if curl -sf "http://${HOST_IP}:${NGINX_PORT}/health" > /dev/null 2>&1; then
     echo "배포 완료: nginx 정상 응답"
 else
     echo "nginx /health 응답 없음 → 확인 필요"
